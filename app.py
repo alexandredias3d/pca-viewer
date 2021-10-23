@@ -23,7 +23,7 @@ app.layout = html.Div([
         children=html.Div(['Drag-and-Drop or Select Files']),
         multiple=False
     ),
-    html.Div(id='parameter-selection'),
+    html.Div(id='parameter-selection')
 ])
 
 @app.callback(
@@ -50,7 +50,7 @@ def is_valid_format(filename: str) -> bool:
     format = path.suffix.lower()
     return True if format == '.csv' else False
 
-def parse_contents(contents, filename, date):
+def parse_contents(contents):
     _, content_string = contents.split(',')
 
     decoded = base64.b64decode(content_string)
