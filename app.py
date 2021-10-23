@@ -23,7 +23,15 @@ app.layout = html.Div([
         children=html.Div(['Drag-and-Drop or Select Files']),
         multiple=False
     ),
-    html.Div(id='parameter-selection')
+    html.Div(id='parameter-selection'),
+    html.Div(
+        id='pca-results',
+        children=
+        [
+            html.H5('PCA Results'),
+            dcc.Graph(id='pca-chart', figure={})
+        ]
+    )
 ])
 
 @app.callback(
@@ -42,7 +50,7 @@ def update_output(file_content, filename, date):
             'Invalid file format. pca-viewer only supports .csv files.'
         ])
     
-    child = parse_contents(file_content, filename, date)
+    child = parse_contents(file_content)
     return child
 
 def is_valid_format(filename: str) -> bool:
