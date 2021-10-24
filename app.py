@@ -1,15 +1,16 @@
-import base64
-import datetime
-import io
+import numpy as np
 
 import dash
 from dash import dcc
 from dash import html
 from dash.dependencies import Input, Output, State
+from dash.exceptions import PreventUpdate
 
-import pandas as pd
+import plotly.graph_objects as go
+import plotly.express as px
 
 from pathlib import Path
+from main import *
 from util import *
 
 external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
@@ -86,16 +87,72 @@ def is_valid_format(filename: str) -> bool:
     return True if format == '.csv' else False
 
 def parse_contents(contents):
-    _, content_string = contents.split(',')
-
-    decoded = base64.b64decode(content_string)
-    df = pd.read_csv(io.StringIO(decoded.decode('utf-8')))
-
+    csv = decode(contents)
+    df = read_csv(csv, nrows=1)
     columns = extract_columns(df)
 
     options = [{'label': column, 'value': index} for index, column in enumerate(columns)]
 
     return options, options
+
+@app.callback(
+    Output('pca-chart', 'figure'),
+    Input('run-pca', 'n_clicks'),
+    State('upload-data', 'contents'),
+    State('components', 'value'),
+    State('color', 'value'),
+    prevent_initial_call=True
+)
+def run_pca_on_click(button_click, contents, components, color):
+
+    if not components:
+        raise PreventUpdate
+
+    if contents is None:
+        return {}
+
+    csv = decode(contents)
+    data = read_csv(csv)
+
+    columns = extract_columns(data)
+    feature_dimensions = columns[components]
+    color_dimension = columns[color]
+
+    features = select_columns(data, feature_dimensions)
+    colors = select_columns(data, color_dimension)
+
+    normalized = normalize_data(features)
+    reduced = run_pca(normalized)
+
+    fig = plot_pca(reduced, colors)
+
+    return fig
+
+def extract_values(array: np.array) -> tuple[np.array, np.array, np.array]:
+    x = array[:, 0]
+    y = array[:, 1]
+    z = None
+    if is_3d(array):
+        z = array[:, 2]
+
+    return x, y, z
+
+def is_3d(array: np.array) -> bool:
+    return True if array.shape[1] == 3 else False
+
+def has_color(color: list[int]) -> bool:
+    return True if color >= 0 else False
+
+def plot_pca(array: np.array, colors: np.array=None):
+    x, y, z = extract_values(array)    
+
+    if is_3d(array):
+        fig = px.scatter_3d(x=x, y=y, z=z, color=colors)
+    else:
+        fig = px.scatter(x=x, y=y, color=colors)
+
+    return fig
+
 
 if __name__ == '__main__':
     app.run_server(debug=True)
