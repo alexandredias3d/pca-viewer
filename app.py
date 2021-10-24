@@ -67,10 +67,9 @@ app.layout = html.Div([
     [Output('components', 'options'), Output('color', 'options')],
     Input('upload-data', 'contents'),
     State('upload-data', 'filename'),
-    State('upload-data', 'last_modified'),
     prevent_initial_call=True
 )
-def update_output(file_content, filename, date):
+def update_output(file_content, filename):
     if file_content is None:
         return
 
