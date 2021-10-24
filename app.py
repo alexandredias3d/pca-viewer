@@ -18,28 +18,57 @@ external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
 
 app.layout = html.Div([
-    dcc.Upload(
-        id='upload-data',
-        children=html.Div(['Drag-and-Drop or Select Files']),
-        multiple=False
+    html.Div(
+        dcc.Upload(
+            id='upload-data',
+            children=html.Div(['Drag-and-Drop or Select Files']),
+            multiple=False
+        ),
+        id='upload'
     ),
-    html.Div(id='parameter-selection'),
+    html.Hr(),
+    html.Div(
+        html.Div([
+            html.Div([
+                html.H5('[Required] Select columns to run PCA on:'),
+                dcc.Checklist(
+                    id='components',
+                    options=[{'label': '', 'value' : ''}],
+                )],            
+                style={'width': '49%', 'display': 'inline-block'}
+            ),
+            html.Div([
+                html.H5('[Optional] Select one column to colorize the data points:'),
+                dcc.Dropdown(
+                    id='color',
+                    options=[{'label': '', 'value' : ''}],
+                )],
+                style={'width': '49%', 'display': 'inline-block', 'vertical-align': 'top'}
+            ),
+        ]),
+        id='parameter-selection'),
+    html.Hr(),
+    html.Div(
+        html.Button('Run PCA', id='run-pca', n_clicks=0),
+        id='run'
+    ),
+    html.Hr(),
     html.Div(
         id='pca-results',
         children=
         [
             html.H5('PCA Results'),
-            dcc.Graph(id='pca-chart', figure={})
+            dcc.Graph(id='pca-chart'),
         ]
     )
 ])
 
 @app.callback(
-    Output('parameter-selection', 'children'),
+    [Output('components', 'options'), Output('color', 'options')],
     Input('upload-data', 'contents'),
     State('upload-data', 'filename'),
     State('upload-data', 'last_modified'),
-    prevent_initial_callback=True
+    prevent_initial_call=True
 )
 def update_output(file_content, filename, date):
     if file_content is None:
@@ -68,28 +97,7 @@ def parse_contents(contents):
 
     options = [{'label': column, 'value': index} for index, column in enumerate(columns)]
 
-    return html.Div([
-        html.Div([
-            html.H5('[Required] Select columns to run PCA on:'),
-            dcc.Checklist(
-                id='components',
-                options=options,
-            )],            
-            style={'width': '49%', 'display': 'inline-block'}
-        ),
-
-        html.Div([
-            html.H5('[Optional] Select one column to colorize the data points:'),
-            dcc.Dropdown(
-                id='color',
-                options=options,
-            )],
-            style={'width': '49%', 'display': 'inline-block', 'vertical-align': 'top'}
-        ),
-
-        html.Hr(),
-    ])
-
+    return options, options
 
 if __name__ == '__main__':
     app.run_server(debug=True)
