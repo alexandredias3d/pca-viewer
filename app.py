@@ -17,12 +17,23 @@ external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 
 app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
 
+button_style = {
+    'width': '99%',
+    'height': '60px',
+    'lineHeight': '60px',
+    'borderWidth': '1px',
+    'borderStyle': 'solid',
+    'borderRadius': '5px',
+    'textAlign': 'center',
+    'margin': '10px'
+}
+
 app.layout = html.Div([
     html.Div(
         dcc.Upload(
             id='upload-data',
-            children=html.Div(['Drag-and-Drop or Select Files']),
-            multiple=False
+            children=html.Button('Select .csv file', style=button_style),
+            multiple=False,
         ),
         id='upload'
     ),
@@ -49,7 +60,13 @@ app.layout = html.Div([
         id='parameter-selection'),
     html.Hr(),
     html.Div(
-        html.Button('Run PCA', id='run-pca', n_clicks=0),
+        html.Button
+        (
+            'Run PCA', 
+            id='run-pca', 
+            n_clicks=0, 
+            style=button_style,
+        ),
         id='run'
     ),
     html.Hr(),
