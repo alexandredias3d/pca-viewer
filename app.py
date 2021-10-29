@@ -98,20 +98,6 @@ def update_output(file_content, filename):
     child = parse_contents(file_content)
     return child
 
-def is_valid_format(filename: str) -> bool:
-    path = Path(filename)
-    format = path.suffix.lower()
-    return True if format == '.csv' else False
-
-def parse_contents(contents):
-    csv = decode(contents)
-    df = read_csv(csv, nrows=1)
-    columns = extract_columns(df)
-
-    options = [{'label': column, 'value': index} for index, column in enumerate(columns)]
-
-    return options, options
-
 @app.callback(
     Output('pca-chart', 'figure'),
     Input('run-pca', 'n_clicks'),
