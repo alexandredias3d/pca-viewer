@@ -46,15 +46,3 @@ def plot_pca(array: np.array, colors: np.array=None):
         fig = px.scatter(x=x, y=y, color=colors)
 
     return fig
-
-if __name__ == '__main__':
-
-    df = pd.read_csv('test.csv')
-
-    d = select_columns(df, ['term1', 'term2', 'term3'])
-    nd = normalize_data(d)
-
-    rd = run_pca(nd)
-
-    print()
-    
