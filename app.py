@@ -75,7 +75,7 @@ app.layout = html.Div([
         children=
         [
             html.H5('PCA Results'),
-            dcc.Graph(id='pca-chart'),
+            dcc.Graph(id='pca-chart', style={'width': '100%', 'height': '100vh'}),
         ]
     )
 ])
