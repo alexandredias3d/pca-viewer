@@ -1,15 +1,9 @@
-import numpy as np
-
 import dash
 from dash import dcc
 from dash import html
 from dash.dependencies import Input, Output, State
 from dash.exceptions import PreventUpdate
 
-import plotly.graph_objects as go
-import plotly.express as px
-
-from pathlib import Path
 from pca_helper import *
 from util import *
 
@@ -130,9 +124,6 @@ def run_pca_on_click(button_click, contents, components, color):
     fig = plot_pca(reduced, colors)
 
     return fig
-
-
-
 
 if __name__ == '__main__':
     app.run_server(debug=True)
