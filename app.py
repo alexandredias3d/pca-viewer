@@ -89,8 +89,11 @@ def update_output(file_content, filename):
             'Invalid file format. pca-viewer only supports .csv files.'
         ])
     
-    child = parse_contents(file_content)
-    return child
+    df = parse_contents(file_content)
+    columns = extract_columns(df)
+    options = [{'label': column, 'value': index} for index, column in enumerate(columns)]
+
+    return options, options
 
 @app.callback(
     Output('pca-chart', 'figure'),
@@ -100,7 +103,7 @@ def update_output(file_content, filename):
     State('color', 'value'),
     prevent_initial_call=True
 )
-def run_pca_on_click(button_click, contents, components, color):
+def run_pca_on_click(button_click, contents, components, selected_color):
 
     if not components:
         raise PreventUpdate
@@ -112,16 +115,20 @@ def run_pca_on_click(button_click, contents, components, color):
     data = read_csv(csv)
 
     columns = extract_columns(data)
-    feature_dimensions = columns[components]
-    color_dimension = columns[color]
 
+    feature_dimensions = columns[components]
     features = select_columns(data, feature_dimensions)
-    colors = select_columns(data, color_dimension)
+
+    if has_color(selected_color):
+        color_dimension = columns[selected_color]
+        color = select_columns(data, color_dimension)
+    else:
+        color = None
 
     normalized = normalize_data(features)
     reduced = run_pca(normalized)
 
-    fig = plot_pca(reduced, colors)
+    fig = plot(reduced, color)
 
     return fig
 
